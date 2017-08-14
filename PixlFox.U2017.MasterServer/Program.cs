@@ -5,6 +5,7 @@ using PixlFox.Gaming.GameServer.Commands;
 using PixlFox.U2017.MasterServer.Components;
 using PixlFox.U2017.MasterServer.Services;
 using PixlFox.U2017.Tools;
+using PixlFox.U2017.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,71 +23,30 @@ namespace PixlFox.U2017.MasterServer
     {
         private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
         private static Core gameCore;
-        private static HandlerRoutine consoleHandler;
+        private static ConsoleUtilities.HandlerRoutine consoleHandler;
 
-        [DllImport("Kernel32")]
-        public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
-        // A delegate type to be used as the handler routine for SetConsoleCtrlHandler.
-        public delegate bool HandlerRoutine(CtrlTypes CtrlType);
-        // An enumerated type for the control messages sent to the handler routine.
-        public enum CtrlTypes
+        private static bool ConsoleCtrlCheck(ConsoleUtilities.CtrlTypes ctrlType)
         {
-            CTRL_C_EVENT = 0,
-            CTRL_BREAK_EVENT,
-            CTRL_CLOSE_EVENT,
-            CTRL_LOGOFF_EVENT = 5,
-            CTRL_SHUTDOWN_EVENT
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ctrlType"></param>
-        /// <returns></returns>
-        private static bool ConsoleCtrlCheck(CtrlTypes ctrlType)
-        {
-            // Put your own handler here
             switch (ctrlType)
             {
-                case CtrlTypes.CTRL_C_EVENT:
-                    gameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!gameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
-
-                case CtrlTypes.CTRL_BREAK_EVENT:
-                    gameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!gameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
-
-                case CtrlTypes.CTRL_CLOSE_EVENT:
-                    gameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!gameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
-
-                case CtrlTypes.CTRL_LOGOFF_EVENT:
-                case CtrlTypes.CTRL_SHUTDOWN_EVENT:
-                    gameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!gameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
+                case ConsoleUtilities.CtrlTypes.CTRL_C_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_BREAK_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_CLOSE_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_LOGOFF_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_SHUTDOWN_EVENT:
+                    logger.Warn("Please use the shutdown command to close the server.");
+                    return true;
             }
 
-            return true;
+            return false;
         }
 
         static void Main(string[] args)
         {
+            ConsoleUtilities.DeleteMenu(ConsoleUtilities.GetSystemMenu(ConsoleUtilities.GetConsoleWindow(), false), ConsoleUtilities.SC_CLOSE, ConsoleUtilities.MF_BYCOMMAND);
+            consoleHandler = new ConsoleUtilities.HandlerRoutine(ConsoleCtrlCheck);
+            ConsoleUtilities.SetConsoleCtrlHandler(consoleHandler, true);
+
             ConfigureLogging();
 
             X509Certificate x509Certificate = Assembly.GetEntryAssembly().GetModules()[0].GetSignerCertificate();
@@ -100,9 +60,6 @@ namespace PixlFox.U2017.MasterServer
                 Console.ReadLine();
                 return;
             }
-
-            consoleHandler = new HandlerRoutine(ConsoleCtrlCheck);
-            SetConsoleCtrlHandler(consoleHandler, true);
 
             CreateServer();
             StartServer();
@@ -166,7 +123,7 @@ namespace PixlFox.U2017.MasterServer
                 })).Start();
             }), new CommandDescriptionInfo
             {
-                Name = "shutdown",
+                Name = "restart",
                 ReturnType = "Void",
                 Description = "Starts the shutdown procedure, then re-initalizes the server."
             });

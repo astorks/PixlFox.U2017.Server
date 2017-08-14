@@ -3,6 +3,7 @@ using NLog;
 using PixlFox.Gaming.GameServer;
 using PixlFox.Gaming.GameServer.Commands;
 using PixlFox.U2017.Tools;
+using PixlFox.U2017.Utilities;
 using PixlFox.U2017.WorldServer.Components;
 using PixlFox.U2017.WorldServer.Services;
 using System;
@@ -21,73 +22,35 @@ namespace PixlFox.U2017.WorldServer
     class Program
     {
         private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
-        private static HandlerRoutine consoleHandler;
+        private static ConsoleUtilities.HandlerRoutine consoleHandler;
 
         public static Core GameCore { get; private set; }
 
-        [DllImport("Kernel32")]
-        public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
-        // A delegate type to be used as the handler routine for SetConsoleCtrlHandler.
-        public delegate bool HandlerRoutine(CtrlTypes CtrlType);
-        // An enumerated type for the control messages sent to the handler routine.
-        public enum CtrlTypes
+        
+        private static bool ConsoleCtrlCheck(ConsoleUtilities.CtrlTypes ctrlType)
         {
-            CTRL_C_EVENT = 0,
-            CTRL_BREAK_EVENT,
-            CTRL_CLOSE_EVENT,
-            CTRL_LOGOFF_EVENT = 5,
-            CTRL_SHUTDOWN_EVENT
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ctrlType"></param>
-        /// <returns></returns>
-        private static bool ConsoleCtrlCheck(CtrlTypes ctrlType)
-        {
-            // Put your own handler here
             switch (ctrlType)
             {
-                case CtrlTypes.CTRL_C_EVENT:
-                    GameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!GameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
-
-                case CtrlTypes.CTRL_BREAK_EVENT:
-                    GameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!GameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
-
-                case CtrlTypes.CTRL_CLOSE_EVENT:
-                    GameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!GameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
-
-                case CtrlTypes.CTRL_LOGOFF_EVENT:
-                case CtrlTypes.CTRL_SHUTDOWN_EVENT:
-                    GameCore.Shutdown();
-                    new Thread(new ThreadStart(() =>
-                    {
-                        while (!GameCore.IsFullyShutdown) Thread.Sleep(1000);
-                    })).Start();
-                    break;
+                case ConsoleUtilities.CtrlTypes.CTRL_C_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_BREAK_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_CLOSE_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_LOGOFF_EVENT:
+                case ConsoleUtilities.CtrlTypes.CTRL_SHUTDOWN_EVENT:
+                    logger.Warn("Please use the shutdown command to close the server.");
+                    return true;
             }
 
-            return true;
+            return false;
         }
+
+        
 
         static void Main(string[] args)
         {
+            ConsoleUtilities.DeleteMenu(ConsoleUtilities.GetSystemMenu(ConsoleUtilities.GetConsoleWindow(), false), ConsoleUtilities.SC_CLOSE, ConsoleUtilities.MF_BYCOMMAND);
+            consoleHandler = new ConsoleUtilities.HandlerRoutine(ConsoleCtrlCheck);
+            ConsoleUtilities.SetConsoleCtrlHandler(consoleHandler, true);
+
             ConfigureLogging();
 
             X509Certificate x509Certificate = Assembly.GetEntryAssembly().GetModules()[0].GetSignerCertificate();
@@ -108,8 +71,7 @@ namespace PixlFox.U2017.WorldServer
                 return;
             }
 
-            consoleHandler = new HandlerRoutine(ConsoleCtrlCheck);
-            SetConsoleCtrlHandler(consoleHandler, true);
+            
 
             CreateServer();
             StartServer();

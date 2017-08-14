@@ -212,6 +212,7 @@
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\PlayerManagerService.cs" />
     <Compile Include="Services\WorldServerManagerService.cs" />
+    <Compile Include="Utilities\ConsoleUtilities.cs" />
     <Compile Include="Utilities\SignTool.cs" />
     <Compile Include="Utilities\SteamworksWebApi.cs" />
     <Compile Include="Components\InterCommunicationServer.cs" />

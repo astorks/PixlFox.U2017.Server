@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using PixlFox.U2017.WorldServer;
 using PixlFox.U2017.WorldServer.Components;
 using PixlFox.U2017.WorldServer.DataModels;
+using PixlFox.U2017.WorldServer.Services;
 using PixlFox.U2017.WorldServer.Utilities;
 using System;
 using System.Collections;

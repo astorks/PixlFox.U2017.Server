@@ -15,35 +15,19 @@ using UnityEngine;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using Lidgren.Network;
 using PixlFox.U2017.WorldServer.Services;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.WorldServer.Components
 {
-    class PlayerManager : IGameComponent
+    class PlayerManager : GameComponent
     {
         public const int MAX_PLAYERS = 2048;
-
-        private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
 
         public Player[] Players { get; } = new Player[MAX_PLAYERS];
         public int CurrentPlayerCount { get; private set; } = 0;
 
-        [GameComponentDependency] private NetworkingComponent Networking { get; set; }
-        [GameServiceDependency] private DatabaseService Database { get; set; }
-
-        public void Initialize(Core gameCore)
-        {
-            
-        }
-
-        public void Shutdown()
-        {
-            
-        }
-
-        public void Tick(double deltaTime)
-        {
-            
-        }
+        [Inject] private NetworkingComponent Networking { get; set; }
+        [Inject] private DatabaseService Database { get; set; }
 
         public async Task<Player> PlayerJoin(Guid playerId, NetConnection networkConnection)
         {
@@ -156,7 +140,7 @@ namespace PixlFox.U2017.WorldServer.Components
             await Database.UpdatePlayer(player);
         }
 
-        //[RegisteredCommand("refetchPlayerFromDataStore")]
+        //[Command("refetchPlayerFromDataStore")]
         //[Description("Re-fetches a player by id from the data store.")]
         //public void RefetchPlayerFromDataStore([Description("The player id as a GUID format.")]string playerIdString)
         //{
@@ -180,7 +164,7 @@ namespace PixlFox.U2017.WorldServer.Components
         //        logger.Error("playerIdString \"{0}\" is not valid format for a GUID", playerIdString);
         //}
 
-        [RegisteredCommand("givePlayerItem")]
+        [Command("givePlayerItem")]
         [Description("Gives a player an item by item id.")]
         public async void GivePlayerItem([Description("The player id as a GUID format.")]string playerIdString, int itemId, int count = 1)
         {
@@ -196,7 +180,7 @@ namespace PixlFox.U2017.WorldServer.Components
                 logger.Error("playerIdString \"{0}\" is not valid format for a GUID", playerIdString);
         }
 
-        [RegisteredCommand("getPlayerPosition")]
+        [Command("getPlayerPosition")]
         [Description("Gets a players position by id.")]
         public Vector3 GetPlayerPosition([Description("The player id as a GUID format or the players name.")]string playerIdString)
         {
@@ -211,7 +195,7 @@ namespace PixlFox.U2017.WorldServer.Components
             return Vector3.zero;
         }
 
-        [RegisteredCommand("getPlayer")]
+        [Command("getPlayer")]
         [Description("Gets a players by id.")]
         public Player GetPlayer([Description("The player id as a GUID format.")]string playerIdString)
         {
@@ -226,7 +210,7 @@ namespace PixlFox.U2017.WorldServer.Components
             return null;
         }
 
-        [RegisteredCommand("teleportPlayer")]
+        [Command("teleportPlayer")]
         [Description("Teleports a player to coordinates.")]
         public void TeleportPlayer([Description("The player id as a GUID format.")]string playerIdString, float x, float y, float z)
         {

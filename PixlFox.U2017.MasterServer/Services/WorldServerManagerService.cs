@@ -11,21 +11,9 @@ using NLog;
 
 namespace PixlFox.U2017.MasterServer.Services
 {
-    class WorldServerManagerService : IGameService
+    class WorldServerManagerService : GameService
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         public ConcurrentDictionary<NetConnection, WorldServer> WorldServers { get; } = new ConcurrentDictionary<NetConnection, WorldServer>();
-
-        public void Initialize(Core gameCore)
-        {
-            
-        }
-
-        public void Shutdown()
-        {
-            
-        }
 
         public void OnWorldServerConnected(NetConnection interServerConnection, int identifier, string name, string address, int port)
         {

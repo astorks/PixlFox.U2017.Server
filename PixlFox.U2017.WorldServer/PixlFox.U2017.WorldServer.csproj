@@ -31,12 +31,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;WORLD_SERVER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -247,7 +247,7 @@
     <Compile Include="Components\NetworkingComponent.cs" />
     <Compile Include="Components\MasterServerConnection.cs" />
     <Compile Include="Components\PlayerManager.cs" />
-    <Compile Include="Components\ResourceManager.cs" />
+    <Compile Include="Services\ResourceManager.cs" />
     <Compile Include="Components\MoverManager.cs" />
     <Compile Include="Components\WorldManager.cs" />
     <Compile Include="DataModels\Account.cs" />

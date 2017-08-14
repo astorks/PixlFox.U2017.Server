@@ -10,22 +10,21 @@ using PixlFox.U2017.WorldServer.Services;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using NLog;
 using System.Collections.Concurrent;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.WorldServer.Components
 {
-    class MasterServerConnection : IGameComponent
+    class MasterServerConnection : GameComponent
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         public NetClient Client { get; set; }
 
         private bool Connected { get; set; }
         private MasterServerConnectionConfig ConfigData { get; set; }
-        [GameServiceDependency] private ConfigService Config { get; set; }
+        [Inject] private ConfigService Config { get; set; }
 
         private ConcurrentDictionary<string, VerificationResult> VerificationResults { get; } = new ConcurrentDictionary<string, VerificationResult>();
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             Config.Changed += Config_Changed;
             ConfigData = Config.GetSectionAs<MasterServerConnectionConfig>("masterServerConnection");
@@ -60,13 +59,13 @@ namespace PixlFox.U2017.WorldServer.Components
             ConnectToServer();
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             if (Client != null && Client.Status == NetPeerStatus.Running)
                 Client.Shutdown("SHUTDOWN");
         }
 
-        public void Tick(double deltaTime)
+        public override void Tick(double deltaTime)
         {
             NetIncomingMessage message;
             while ((message = Client.ReadMessage()) != null)

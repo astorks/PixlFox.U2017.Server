@@ -71,8 +71,6 @@ namespace PixlFox.U2017.WorldServer
                 return;
             }
 
-            
-
             CreateServer();
             StartServer();
 
@@ -87,13 +85,13 @@ namespace PixlFox.U2017.WorldServer
             GameCore.RegisterService<DatabaseService>();
             GameCore.RegisterService<ResourceManager>();
             GameCore.RegisterComponent<PlayerManager>();
-            GameCore.RegisterComponent<MoverManager>();
 
             GameCore.RegisterService<ChatService>();
 
             GameCore.RegisterComponent<MasterServerConnection>();
             GameCore.RegisterComponent<NetworkingComponent>();
             GameCore.RegisterComponent<WorldManager>();
+            GameCore.RegisterComponent<MoverManager>();
 
             GameCore.RegisterCommandHandler("clear", new Action(() => Console.Clear()), new CommandDescriptionInfo
             {

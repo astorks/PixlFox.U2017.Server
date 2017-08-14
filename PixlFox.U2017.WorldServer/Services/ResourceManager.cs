@@ -9,16 +9,16 @@ using PixlFox.U2017.WorldServer.DataModels;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace PixlFox.U2017.WorldServer.Components
+namespace PixlFox.U2017.WorldServer.Services
 {
-    class ResourceManager : IGameService
+    class ResourceManager : GameService
     {
         public static ResourceManager Instance { get; private set; }
 
         private Dictionary<int, Item> Items { get; } = new Dictionary<int, Item>();
         private Dictionary<int, Mover> Movers { get; } = new Dictionary<int, Mover>();
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             Instance = this;
 
@@ -29,11 +29,6 @@ namespace PixlFox.U2017.WorldServer.Components
             var movers = JsonConvert.DeserializeObject<Mover[]>(File.ReadAllText("../data/movers.json"));
             foreach (var mover in movers)
                 Movers.Add(mover.Id, mover);
-        }
-
-        public void Shutdown()
-        {
-            
         }
 
         public Item GetItem(int itemId)

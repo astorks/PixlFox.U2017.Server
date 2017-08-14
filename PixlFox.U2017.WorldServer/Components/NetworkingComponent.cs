@@ -11,25 +11,24 @@ using PixlFox.Gaming.GameServer.DependencyInjection;
 using NLog;
 using System.Net;
 using System.Collections.Concurrent;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.WorldServer.Components
 {
-    class NetworkingComponent : IGameComponent
+    class NetworkingComponent : GameComponent
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         public NetServer Server { get; set; }
 
-        [GameServiceDependency] private ConfigService Config { get; set; }
-        [GameComponentDependency] private MasterServerConnection MasterServerConnection { get; set; }
-        [GameComponentDependency] private PlayerManager PlayerManager { get; set; }
-        [GameServiceDependency] private ChatService ChatService { get; set; }
-        [GameServiceDependency] private DatabaseService DocumentService { get; set; }
+        [Inject] private ConfigService Config { get; set; }
+        [Inject] private MasterServerConnection MasterServerConnection { get; set; }
+        [Inject] private PlayerManager PlayerManager { get; set; }
+        [Inject] private ChatService ChatService { get; set; }
+        [Inject] private DatabaseService DocumentService { get; set; }
         private NetworkingConfig ConfigData { get; set; }
 
         public ConcurrentDictionary<ulong, NetConnection> Connections { get; } = new ConcurrentDictionary<ulong, NetConnection>();
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             Config.Changed += Config_Changed;
             ConfigData = Config.GetSectionAs<NetworkingConfig>("serverNetworking");
@@ -54,12 +53,12 @@ namespace PixlFox.U2017.WorldServer.Components
             ConfigData = Config.GetSectionAs<NetworkingConfig>("masterServerConnection");
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             Server.Shutdown("SHUTDOWN");
         }
 
-        public void Tick(double deltaTime)
+        public override void Tick(double deltaTime)
         {
             NetIncomingMessage message;
             while ((message = Server.ReadMessage()) != null)

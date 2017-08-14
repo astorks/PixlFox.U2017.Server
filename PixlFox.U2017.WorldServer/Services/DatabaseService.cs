@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using NLog;
 using PixlFox.Gaming.GameServer;
+using PixlFox.Gaming.GameServer.Attributes;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using PixlFox.Gaming.GameServer.Interfaces;
 using System;
@@ -9,19 +10,17 @@ using System.Threading.Tasks;
 
 namespace PixlFox.U2017.WorldServer.Services
 {
-    class DatabaseService : IGameService
+    class DatabaseService : GameService
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         private MongoClient Client { get; set; }
         public IMongoDatabase Database { get; private set; }
 
         public IMongoCollection<Player> PlayersCollection { get; private set; }
 
-        [GameServiceDependency] private ConfigService Config { get; set; }
+        [Inject] private ConfigService Config { get; set; }
         private DatabaseConfig ConfigData { get; set; }
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             Config.Changed += Config_Changed;
             ConfigData = Config.GetSectionAs<DatabaseConfig>("db");
@@ -29,11 +28,6 @@ namespace PixlFox.U2017.WorldServer.Services
             Client = new MongoClient(ConfigData.ConnectionString);
             Database = Client.GetDatabase(ConfigData.Database);
             PlayersCollection = Database.GetCollection<Player>("Players");
-        }
-
-        public void Shutdown()
-        {
-            
         }
 
         private void Config_Changed(object sender, EventArgs e)

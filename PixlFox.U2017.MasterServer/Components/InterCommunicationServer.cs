@@ -11,21 +11,21 @@ using NLog;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using System.Net;
 using PixlFox.Gaming.GameServer.Commands;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.MasterServer.Components
 {
-    public class InterCommunicationServer : IGameComponent
+    public class InterCommunicationServer : GameComponent
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         private DateTime blockConnectionsAfter;
 
         private NetServer Server { get; set; }
         private InterCommunicationServerConfig ConfigData { get; set; }
-        [GameServiceDependency] private ConfigService Config { get; set; }
-        [GameServiceDependency] private WorldServerManagerService WorldServerManager { get; set; }
-        [GameServiceDependency] private AccountManagerService AccountManager { get; set; }
+        [Inject] private ConfigService Config { get; set; }
+        [Inject] private WorldServerManagerService WorldServerManager { get; set; }
+        [Inject] private AccountManagerService AccountManager { get; set; }
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             Config.Changed += Config_Changed;
             ConfigData = Config.GetSectionAs<InterCommunicationServerConfig>("interCommunicationServer");
@@ -53,13 +53,13 @@ namespace PixlFox.U2017.MasterServer.Components
             ConfigData = Config.GetSectionAs<InterCommunicationServerConfig>("interCommunicationServer");
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             Server.Shutdown("SHUTDOWN");
             logger.Debug("Shutdown networking.");
         }
 
-        public void Tick(double deltaTime)
+        public override void Tick(double deltaTime)
         {
             NetIncomingMessage message;
             while ((message = Server.ReadMessage()) != null)
@@ -138,7 +138,7 @@ namespace PixlFox.U2017.MasterServer.Components
             }
         }
 
-        [RegisteredCommand("allowWorldServerConnections")]
+        [Command("allowWorldServerConnections")]
         public void AllowWorldServerConnections(string duration = "")
         {
             if(TimeSpan.TryParse(duration, out TimeSpan allowConnectionsDuration))

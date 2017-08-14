@@ -12,21 +12,21 @@ using PixlFox.Gaming.GameServer.Commands;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using PixlFox.U2017.MasterServer.Services;
 using NLog;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.MasterServer.Components
 {
-    public class PublicNetworkServer : IGameComponent
+    public class PublicNetworkServer : GameComponent
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         private PublicNetworkServerConfig ConfigData { get; set; }
         private NetServer Server { get; set; }
 
-        [GameServiceDependency] private ConfigService Config { get; set; }
-        [GameServiceDependency] private WorldServerManagerService WorldServerManager { get; set; }
-        [GameServiceDependency] private AccountManagerService AccountManager { get; set; }
+        [Inject] private ConfigService Config { get; set; }
+        [Inject] private WorldServerManagerService WorldServerManager { get; set; }
+        [Inject] private AccountManagerService AccountManager { get; set; }
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             Config.Changed += Config_Changed;
             ConfigData = Config.GetSectionAs<PublicNetworkServerConfig>("publicNetworkServer");
@@ -51,13 +51,13 @@ namespace PixlFox.U2017.MasterServer.Components
             ConfigData = Config.GetSectionAs<PublicNetworkServerConfig>("publicNetworkServer");
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             Server.Shutdown("SHUTDOWN");
             logger.Debug("Shutdown networking.");
         }
 
-        public void Tick(double deltaTime)
+        public override void Tick(double deltaTime)
         {
             NetIncomingMessage message;
             while ((message = Server.ReadMessage()) != null)
@@ -106,7 +106,7 @@ namespace PixlFox.U2017.MasterServer.Components
         }
 
         #region Commands
-        [RegisteredCommand("ccu")]
+        [Command("ccu")]
         public Dictionary<string, int> CCU()
         {
             return new Dictionary<string, int>()

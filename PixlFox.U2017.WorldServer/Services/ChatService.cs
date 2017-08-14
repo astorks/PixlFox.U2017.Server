@@ -8,23 +8,14 @@ using PixlFox.Gaming.GameServer;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using Lidgren.Network;
 using PixlFox.U2017.WorldServer.Components;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.WorldServer.Services
 {
-    class ChatService : IGameService
+    class ChatService : GameService
     {
-        [GameComponentDependency] private PlayerManager PlayerManager { get; set; }
-        [GameComponentDependency] private NetworkingComponent Networking { get; set; }
-
-        public void Initialize(Core gameCore)
-        {
-            
-        }
-
-        public void Shutdown()
-        {
-            
-        }
+        [Inject] private PlayerManager PlayerManager { get; set; }
+        [Inject] private NetworkingComponent Networking { get; set; }
 
         public void OnReceivedChatMessage(Player sender, string message)
         {

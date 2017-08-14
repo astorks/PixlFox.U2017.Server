@@ -13,28 +13,24 @@ using NLog;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using Lidgren.Network;
 using PixlFox.U2017.WorldServer.DataModels;
+using PixlFox.Gaming.GameServer.Attributes;
+using PixlFox.U2017.WorldServer.Services;
 
 namespace PixlFox.U2017.WorldServer.Components
 {
-    class MoverManager : IGameComponent
+    class MoverManager : GameComponent
     {
-        private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
-
         public SpawnedMover[] SpawnedMovers { get; } = new SpawnedMover[20480];
         public int CurrentMaxSpawnedMover { get; set; } = 0;
 
 
-        [GameComponentDependency] private NetworkingComponent Networking { get; set; }
-        [GameComponentDependency] private PlayerManager PlayerManager { get; set; }
+        [Inject] private NetworkingComponent Networking { get; set; }
+        [Inject] private PlayerManager PlayerManager { get; set; }
+        [Inject] private WorldManager WorldManager { get; set; }
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
-            SpawnMovers(1, new Vector3(5, 70, 5), 10, 25);
-        }
-
-        public void Shutdown()
-        {
-            
+            SpawnMovers(1, new Vector3(5, 70, 5), 30f, 25);
         }
 
         public void SpawnMovers(int moverId, Vector3 position, float radius, int count)
@@ -46,7 +42,7 @@ namespace PixlFox.U2017.WorldServer.Components
                     Id = Guid.NewGuid(),
                     Position = position,
                     MoverId = moverId,
-                    WorldId = 1
+                    World = WorldManager.Worlds[1]
                 };
 
                 SpawnedMovers[CurrentMaxSpawnedMover] = spawnedMover;
@@ -54,8 +50,10 @@ namespace PixlFox.U2017.WorldServer.Components
             }
         }
 
-        public void Tick(double deltaTime)
+        public override void Tick(double deltaTime)
         {
+            Parallel.For(0, CurrentMaxSpawnedMover, (i) => SpawnedMovers[i].Tick(deltaTime));
+
             Parallel.For(0, PlayerManager.CurrentPlayerCount, (i) =>
             {
                 var connectedPlayer = PlayerManager.Players[i];
@@ -93,7 +91,7 @@ namespace PixlFox.U2017.WorldServer.Components
             {
                 var spawnedMover = SpawnedMovers[i];
 
-                if (player.WorldId == spawnedMover.WorldId && Vector3.Distance(player.Position, spawnedMover.Position) <= distance)
+                if (player.WorldId == spawnedMover.World.Id && Vector3.Distance(player.Position, spawnedMover.Position) <= distance)
                 {
                     spawnedMovers[moverCount] = spawnedMover;
                     moverCount++;
@@ -117,12 +115,26 @@ namespace PixlFox.U2017.WorldServer.Components
         }
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
-        public int WorldId { get; set; }
+        public World World { get; set; }
 
         public Player CurrentTarget { get; set; }
 
         public float CurrentHealth { get; set; }
 
         public float TimeSinceLastAttack { get; set; } = 0f;
+
+        public bool IsDead { get; set; }
+
+        public void Tick(double deltaTime)
+        {
+            var height = World.Terrain.SampleHeight(Position);
+            Position = new Vector3(Position.x, height, Position.z);
+
+            if (CurrentHealth <= 0)
+            {
+                CurrentHealth = 0;
+                IsDead = true;
+            }
+        }
     }
 }

@@ -10,19 +10,18 @@ using System.Dynamic;
 using PixlFox.Gaming.GameServer.Commands;
 using Microsoft.Extensions.Configuration;
 using NLog;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.MasterServer.Services
 {
-    class ConfigService : IGameService
+    class ConfigService : GameService
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         public IConfigurationRoot Config { get; private set; }
         public event EventHandler Loaded;
         public event EventHandler Changed;
 
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             var configBuilder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory());
 
@@ -54,11 +53,6 @@ namespace PixlFox.U2017.MasterServer.Services
             Loaded?.Invoke(this, new EventArgs());
         }
 
-        public void Shutdown()
-        {
-            
-        }
-
         private void ConfigChanged(object state)
         {
             Steamworks.SteamworksWebApi.PublisherApiKey = GetValue<string>("steamWorksApi:publisherApiKey");
@@ -73,7 +67,7 @@ namespace PixlFox.U2017.MasterServer.Services
             return Config.GetValue(key, defaultValue);
         }
 
-        [RegisteredCommand("getConfigValue")]
+        [Command("getConfigValue")]
         public object GetValue(string key, Type t = null, object defaultValue = null)
         {
             if (t == null)
@@ -87,13 +81,13 @@ namespace PixlFox.U2017.MasterServer.Services
             return Config.GetSection(key).Get<T>();
         }
 
-        [RegisteredCommand("getConfigSection")]
+        [Command("getConfigSection")]
         public Dictionary<string, object> GetSection(string key)
         {
             return Config.GetSection(key).Get<Dictionary<string, object>>();
         }
 
-        [RegisteredCommand("reloadConfig")]
+        [Command("reloadConfig")]
         public void ReloadConfig()
         {
             logger.Debug("Reloading config...");

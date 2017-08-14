@@ -12,19 +12,18 @@ using System.IO;
 using NLog;
 using PixlFox.Gaming.GameServer.DependencyInjection;
 using Lidgren.Network;
+using PixlFox.Gaming.GameServer.Attributes;
 
 namespace PixlFox.U2017.WorldServer.Components
 {
-    class WorldManager : IGameComponent
+    class WorldManager : GameComponent
     {
-        private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
-
         public ConcurrentDictionary<int, World> Worlds { get; } = new ConcurrentDictionary<int, World>();
 
-        [GameComponentDependency] private NetworkingComponent Networking { get; set; }
-        [GameComponentDependency] private PlayerManager PlayerManager { get; set; }
+        [Inject] private NetworkingComponent Networking { get; set; }
+        [Inject] private PlayerManager PlayerManager { get; set; }
 
-        public void Initialize(Core gameCore)
+        public override void Initialize(Core gameCore)
         {
             World[] worlds = JsonConvert.DeserializeObject<World[]>(File.ReadAllText("../data/worlds.json"));
 
@@ -35,12 +34,7 @@ namespace PixlFox.U2017.WorldServer.Components
             }
         }
 
-        public void Shutdown()
-        {
-            
-        }
-
-        public void Tick(double deltaTime)
+        public override void Tick(double deltaTime)
         {
             Parallel.For(0, PlayerManager.CurrentPlayerCount, (i) =>
             {

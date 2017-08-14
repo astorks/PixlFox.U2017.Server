@@ -12,14 +12,11 @@ using System.ComponentModel;
 
 namespace PixlFox.U2017.MasterServer.Services
 {
-    class AccountManagerService : IGameService
+    class AccountManagerService : GameService
     {
         public ConcurrentDictionary<string, AccountInfo> CurrentAccounts { get; } = new ConcurrentDictionary<string, AccountInfo>();
 
         private RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
-
-        public void Initialize(Core gameCore) { }
-        public void Shutdown() { }
 
         public AccountInfo GetAccount(string authKey)
         {

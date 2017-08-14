@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixlFox.U2017.WorldServer", "PixlFox.U2017.WorldServer\PixlFox.U2017.WorldServer.csproj", "{91A7D1AA-91ED-44A5-A35A-1AEAC9AFE447}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixlFox.U2017.MasterServer", "PixlFox.U2017.MasterServer\PixlFox.U2017.MasterServer.csproj", "{466C5137-05FC-490B-9E52-1CFD3BBA6A35}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91A7D1AA-91ED-44A5-A35A-1AEAC9AFE447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91A7D1AA-91ED-44A5-A35A-1AEAC9AFE447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91A7D1AA-91ED-44A5-A35A-1AEAC9AFE447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91A7D1AA-91ED-44A5-A35A-1AEAC9AFE447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{466C5137-05FC-490B-9E52-1CFD3BBA6A35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{466C5137-05FC-490B-9E52-1CFD3BBA6A35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{466C5137-05FC-490B-9E52-1CFD3BBA6A35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{466C5137-05FC-490B-9E52-1CFD3BBA6A35}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
